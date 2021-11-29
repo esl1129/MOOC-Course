@@ -36,12 +36,13 @@ extension APIManager{
                     case .success(let object):
                         do{
                             let dataJSON = try JSONSerialization.data(withJSONObject: object, options: .prettyPrinted)
-                            let getInstanceData = try? JSONDecoder().decode(CourseList.self, from: dataJSON)
-                            NotificationCenter.default.post(name: .stopSpin, object: nil)
-                            NSLog("Success : getCourse")
-                            APIManager.shared.courseData += getInstanceData!.courseInfo
-                            observer.onNext(APIManager.shared.courseData)
-                            observer.onCompleted()
+                            if let getInstanceData = try? JSONDecoder().decode(CourseList.self, from: dataJSON){
+                                NotificationCenter.default.post(name: .stopSpin, object: nil)
+                                NSLog("Success : getCourse")
+                                APIManager.shared.courseData += getInstanceData.courseInfo
+                                observer.onNext(APIManager.shared.courseData)
+                                observer.onCompleted()
+                            }
                         }catch{
                         }
                     case .failure(let err):
@@ -65,18 +66,19 @@ extension APIManager{
                     case .success(let object):
                         do{
                             let dataJSON = try JSONSerialization.data(withJSONObject: object, options: .prettyPrinted)
-                            let getInstanceData = try? JSONDecoder().decode(CourseDetail.self, from: dataJSON)
-                            NotificationCenter.default.post(name: .stopSpin, object: nil)
-                            NSLog("Success : getHtml")
-                            observer.onNext(getInstanceData!)
-                            observer.onCompleted()
+                            if let getInstanceData = try? JSONDecoder().decode(CourseList.self, from: dataJSON){
+                                NotificationCenter.default.post(name: .stopSpin, object: nil)
+                                NSLog("Success : getHtml")
+                                observer.onNext(getInstanceData)
+                                observer.onCompleted()
+                            }
                         }catch{
                         }
                     case .failure(let err):
                         NotificationCenter.default.post(name: .stopSpin, object: nil)
                         NSLog("Failure : getHtml")
                         observer.onError(err)
-
+                        
                     }
                 }
             return Disposables.create()
